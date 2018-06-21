@@ -56,8 +56,7 @@ template <typename Schedule>
 inline isl::UnionMap<Statement, Schedule> prefixSchedule(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* node) {
-  auto prefix = detail::partialScheduleImpl<Schedule>(root, node, false);
-  return isl::UnionMap<Statement, Schedule>(prefix);
+  return detail::partialScheduleImpl<Schedule>(root, node, false);
 }
 
 template <typename Schedule>
