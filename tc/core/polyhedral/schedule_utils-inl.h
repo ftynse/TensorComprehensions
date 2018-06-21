@@ -63,8 +63,7 @@ template <typename Schedule>
 inline isl::UnionMap<Statement, Schedule> partialSchedule(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* node) {
-  auto prefix = detail::partialScheduleImpl<Schedule>(root, node, true);
-  return isl::UnionMap<Statement, Schedule>(prefix);
+  return detail::partialScheduleImpl<Schedule>(root, node, true);
 }
 
 namespace detail {
