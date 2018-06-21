@@ -47,9 +47,29 @@ std::vector<const detail::ScheduleTree*> collectScheduleTreesPath(
 
 // Given a schedule defined by the ancestors of the given node,
 // extend it to a schedule that also covers the node itself.
-isl::union_map extendSchedule(
+template <typename Schedule>
+isl::UnionMap<Statement, Schedule> extendSchedule(
     const detail::ScheduleTree* node,
-    isl::union_map schedule);
+    isl::UnionMap<Statement, Schedule> schedule) {
+  if (auto bandElem = node->as<detail::ScheduleTreeBand>()) {
+    if (bandElem->nMember() > 0) {
+      schedule = schedule.template flat_range_product<Schedule>(
+          bandElem->mupa_.toUnionMap());
+    }
+  } else if (auto filterElem = node->as<detail::ScheduleTreeFilter>()) {
+    schedule = schedule.intersect_domain(filterElem->filter_);
+  } else if (auto extensionElem = node->as<detail::ScheduleTreeExtension>()) {
+    // FIXME: we may need to restrict the range of reversed extension map to
+    // schedule values that correspond to active domain elements at this
+    // point.
+    auto extension = extensionElem->extension_.reverse();
+    auto specializedExtension = isl::UnionMap<Statement, Schedule>(extension);
+    schedule =
+        schedule.unite(specializedExtension.intersect_range(schedule.range()));
+  }
+
+  return schedule;
+}
 
 // Get the partial schedule defined by ancestors of the given node and the node
 // itself.
@@ -113,7 +133,7 @@ isl::UnionSet<Statement> activeDomainPointsBelow(
 
 // Collect the outer block/thread identifier mappings
 // into a filter on the active domain elements.
-isl::union_set prefixMappingFilter(
+isl::UnionSet<Statement> prefixMappingFilter(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* node);
 

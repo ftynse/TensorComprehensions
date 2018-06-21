@@ -88,7 +88,8 @@ ScheduleTree* joinBandsHelper(ScheduleTree* st, bool& moveChildren) {
 
   auto& partialSchedule = eb->mupa_;
   auto& partialScheduleChild = ebChild->mupa_;
-  partialSchedule = partialSchedule.flat_range_product(partialScheduleChild);
+  partialSchedule =
+      partialSchedule.flat_range_product<Band>(partialScheduleChild);
   eb->coincident_.resize(
       eb->coincident_.size() + ebChild->coincident_.size(), false);
   eb->unroll_.insert(
@@ -284,7 +285,9 @@ ScheduleTree* insertTopLevelEmptyBand(ScheduleTree* root) {
   return insertNodeBelow(node, ScheduleTree::makeEmptyBand(root));
 }
 
-void updateTopLevelContext(detail::ScheduleTree* root, isl::set context) {
+void updateTopLevelContext(
+    detail::ScheduleTree* root,
+    isl::Set<Prefix> context) {
   if (!matchOne(tc::polyhedral::domain(tc::polyhedral::context(any())), root)) {
     root->appendChild(
         ScheduleTree::makeContext(context, root->detachChildren()));
@@ -393,7 +396,7 @@ void insertExtensionAt(
     ScheduleTree* relativeRoot,
     ScheduleTree* seqNode,
     size_t pos,
-    isl::union_map extension,
+    isl::UnionMap<Prefix, Statement> extension,
     ScheduleTreeUPtr&& filterNode) {
   auto extensionTree = seqNode->ancestor(relativeRoot, 1);
   auto extensionNode = extensionTree->as<detail::ScheduleTreeExtension>();
@@ -412,7 +415,7 @@ void insertExtensionBefore(
     const ScheduleTree* root,
     ScheduleTree* relativeRoot,
     ScheduleTree* tree,
-    isl::union_map extension,
+    isl::UnionMap<Prefix, Statement> extension,
     ScheduleTreeUPtr&& filterNode) {
   size_t pos;
   auto parent = tree->ancestor(relativeRoot, 1);
@@ -441,7 +444,7 @@ void insertExtensionAfter(
     const ScheduleTree* root,
     ScheduleTree* relativeRoot,
     ScheduleTree* tree,
-    isl::union_map extension,
+    isl::UnionMap<Prefix, Statement> extension,
     ScheduleTreeUPtr&& filterNode) {
   size_t pos;
   auto parent = tree->ancestor(relativeRoot, 1);
@@ -503,7 +506,7 @@ namespace {
  * of band node partial schedules.
  * Elements of a sequence that end up with an empty filter are removed.
  */
-void gist(ScheduleTree* tree, isl::union_set context) {
+void gist(ScheduleTree* tree, isl::UnionSet<Statement> context) {
   if (auto bandElem = tree->as<ScheduleTreeBand>()) {
     bandElem->mupa_ = bandElem->mupa_.gist(context);
   } else if (auto filterElem = tree->as<ScheduleTreeMapping>()) {
@@ -533,7 +536,9 @@ void gist(ScheduleTree* tree, isl::union_set context) {
  * Create a filter node with the given filter and single child node,
  * after simplifying the child node in the context of the filter.
  */
-ScheduleTreeUPtr gistedFilter(isl::union_set filter, ScheduleTreeUPtr child) {
+ScheduleTreeUPtr gistedFilter(
+    isl::UnionSet<Statement> filter,
+    ScheduleTreeUPtr child) {
   gist(child.get(), filter);
   return ScheduleTree::makeFilter(filter, std::move(child));
 }
@@ -556,7 +561,8 @@ bool canOrder(
   auto zero = isl::MultiVal<isl::Anonymous>::zero(space);
   auto one = zero.set_val(0, isl::val::one(ctx));
   auto order = isl::MultiUnionPwAff<Statement, isl::Anonymous>(first, zero);
-  order = order.union_add(isl::MultiUnionPwAff<Statement, isl::Anonymous>(second, one));
+  order = order.union_add(
+      isl::MultiUnionPwAff<Statement, isl::Anonymous>(second, one));
 
   // Check that this ordering preserves all dependences.
   auto preserved = dependences.lex_lt_at(order).unite(dependences.eq_at(order));

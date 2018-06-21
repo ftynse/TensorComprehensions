@@ -27,7 +27,8 @@ namespace tc {
 namespace polyhedral {
 
 namespace detail {
-inline isl::union_map partialScheduleImpl(
+template <typename Schedule>
+inline isl::UnionMap<Statement, Schedule> partialScheduleImpl(
     const ScheduleTree* root,
     const ScheduleTree* node,
     bool useNode) {
@@ -36,9 +37,10 @@ inline isl::union_map partialScheduleImpl(
     nodes.push_back(node);
   }
   TC_CHECK_GT(nodes.size(), 0u) << "root node does not have a prefix schedule";
-  auto domain = root->as<ScheduleTreeDomain>();
+  auto domain = root->as<detail::ScheduleTreeDomain>();
   TC_CHECK(domain);
-  auto schedule = isl::union_map::from_domain(domain->domain_);
+  auto schedule =
+      isl::UnionMap<Statement, Schedule>::from_domain(domain->domain_);
   for (auto anc : nodes) {
     if (anc->as<ScheduleTreeDomain>()) {
       TC_CHECK(anc == root);
@@ -54,7 +56,7 @@ template <typename Schedule>
 inline isl::UnionMap<Statement, Schedule> prefixSchedule(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* node) {
-  auto prefix = detail::partialScheduleImpl(root, node, false);
+  auto prefix = detail::partialScheduleImpl<Schedule>(root, node, false);
   return isl::UnionMap<Statement, Schedule>(prefix);
 }
 
@@ -62,7 +64,7 @@ template <typename Schedule>
 inline isl::UnionMap<Statement, Schedule> partialSchedule(
     const detail::ScheduleTree* root,
     const detail::ScheduleTree* node) {
-  auto prefix = detail::partialScheduleImpl(root, node, true);
+  auto prefix = detail::partialScheduleImpl<Schedule>(root, node, true);
   return isl::UnionMap<Statement, Schedule>(prefix);
 }
 
