@@ -333,8 +333,8 @@ bool accessSubscriptsAreUnrolledLoops(
       }
     }
 
-    auto space =
-        subdomain.get_space().add_unnamed_tuple_ui<Unrolled>(unrolledDims.size());
+    auto space = subdomain.get_space().add_unnamed_tuple_ui<Unrolled>(
+        unrolledDims.size());
     auto unrolledDimsMupa = isl::multi_union_pw_aff(space, unrolledDims);
 
     // It is possible that no loops are unrolled, in which case
@@ -343,7 +343,7 @@ bool accessSubscriptsAreUnrolledLoops(
     unrolledDimsMupa =
         unrolledDimsMupa.intersect_domain(group.originalAccesses().domain());
 
-    auto accesses = group.originalAccesses();
+    isl::union_map accesses = group.originalAccesses();
     auto schedule = outerSchedule.flat_range_product(unrolledDimsMupa);
     accesses = accesses.apply_domain(isl::union_map::from(schedule));
 
@@ -656,8 +656,7 @@ void promoteToRegistersBelow(MappedScop& mscop, detail::ScheduleTree* scope) {
   auto blockSchedule = mscop.blockMappingSchedule(mscop.schedule());
 
   // Pure affine schedule without (mapping) filters.
-  isl::multi_union_pw_aff partialSchedMupa =
-      partialScheduleMupa<Scope>(root, scope);
+  auto partialSchedMupa = partialScheduleMupa<Scope>(root, scope);
   // Schedule with block mapping filter.
   auto partialSched =
       isl::union_map::from(partialSchedMupa).intersect_domain(blockMapping);
@@ -665,7 +664,7 @@ void promoteToRegistersBelow(MappedScop& mscop, detail::ScheduleTree* scope) {
   // performed with respect to the block mapping, so append the block schedule.
   // If the partial schedule contains it already, it will just end up with
   // identical dimensions without affecting the result of the checks.
-  partialSchedMupa = partialSchedMupa.flat_range_product(blockSchedule);
+  auto partialSchedBlockMupa = partialSchedMupa.range_product(blockSchedule);
 
   for (auto& tensorGroups : groupMap) {
     auto tensorId = tensorGroups.first;
@@ -679,11 +678,11 @@ void promoteToRegistersBelow(MappedScop& mscop, detail::ScheduleTree* scope) {
         continue;
       }
       if (!isPromotableToRegistersBelow(
-              *group, root, scope, partialSchedMupa, threadSchedule)) {
+              *group, root, scope, partialSchedBlockMupa, threadSchedule)) {
         continue;
       }
       // Check reuse within threads.
-      auto schedule = partialSchedMupa.flat_range_product(threadSchedule);
+      auto schedule = partialSchedBlockMupa.range_product(threadSchedule);
       if (!hasReuseWithin(*group, schedule)) {
         continue;
       }
