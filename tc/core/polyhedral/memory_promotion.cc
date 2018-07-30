@@ -44,26 +44,27 @@ namespace {
 //   D -> O: o_i = f(D)
 //
 // by subtracting "offsets" and by dividing the result by "strides".
-isl::map removeRangeStrides(
-    isl::map relation,
-    isl::multi_val strides,
-    isl::multi_aff offsets) {
+template <typename Domain, typename Range>
+isl::Map<Domain, Range> removeRangeStrides(
+    isl::Map<Domain, Range> relation,
+    isl::MultiVal<Range> strides,
+    isl::MultiAff<Domain, Range> offsets) {
   TC_CHECK_EQ(strides.size(), offsets.size());
 
   auto space = relation.get_space();
-  auto stridesMA = isl::multi_aff::identity(space.range().map_from_set());
+  auto stridesMA = isl::MultiAff<Range, Range>::identity(space.range().map_from_set());
   stridesMA = stridesMA / strides;
 
-  return relation.sum(isl::map(offsets.neg())).apply_range(isl::map(stridesMA));
+  return relation.sum(offsets.neg().asMap()).apply_range(stridesMA.asMap());
 }
 
 // Compute a box approximation of the range of the given relation,
 // including the lower bounds, the box sizes, and the strides.
 // If the range has strides, remove them first.
-ScopedFootprint outputRanges(isl::map access) {
+ScopedFootprint outputRanges(isl::Map<Scope, Tensor> access) {
   ScopedFootprint footprint;
-  footprint.strideValues = isl::multi_val::zero(access.get_space().range());
-  footprint.strideOffsets = isl::multi_aff::zero(access.get_space());
+  footprint.strideValues = isl::MultiVal<Tensor>::zero(access.get_space().range());
+  footprint.strideOffsets = isl::MultiAff<Scope, Tensor>::zero(access.get_space());
 
   int nSubscripts = footprint.strideValues.size();
   for (int i = 0; i < nSubscripts; ++i) {
@@ -370,17 +371,17 @@ TensorGroups TensorReferenceGroup::accessedWithin(
 // outer schedule dimensions.
 isl::multi_aff TensorReferenceGroup::promotion() const {
   // access space is S -> O
-  isl::map map = scopedAccesses();
+  auto map = scopedAccesses();
   auto accessSpace = map.get_space();
 
   // Construct a projection multi-aff in [S -> O] -> S
   // for further precomposition.
-  auto originalSpaceInserter = isl::multi_aff::domain_map(accessSpace);
+  auto originalSpaceInserter = isl::MultiAff<isl::Pair<Scope, Tensor>, Scope>::domain_map(accessSpace);
 
   // Lower bounds and offsets space is S -> O; transform into [S -> O] -> O.
-  auto lowerBounds =
+  isl::multi_aff lowerBounds =
       approximation.lowerBounds().pullback(originalSpaceInserter);
-  auto offsets = approximation.strideOffsets.pullback(originalSpaceInserter);
+  isl::multi_aff offsets = approximation.strideOffsets.pullback(originalSpaceInserter);
 
   // Create promotion starting by identity in [S -> O] -> O.
   auto original = isl::multi_aff::range_map(accessSpace);
