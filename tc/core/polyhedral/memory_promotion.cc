@@ -132,7 +132,7 @@ isl::map TensorReferenceGroup::approximateScopedAccesses() const {
   return accessed;
 }
 
-isl::multi_aff ScopedFootprint::lowerBounds() const {
+isl::MultiAff<Scope, Tensor> ScopedFootprint::lowerBounds() const {
   if (dim() == 0) {
     throw promotion::PromotionNYI("promotion for scalars");
   }

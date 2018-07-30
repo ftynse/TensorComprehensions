@@ -58,11 +58,11 @@ struct ScopedFootprint {
     return strideOffsets.get_aff(pos);
   }
 
-  isl::fixed_box box;
+  isl::FixedBox<Scope, Tensor> box;
   isl::MultiVal<Tensor> strideValues;
   isl::MultiAff<Scope, Tensor> strideOffsets;
 
-  isl::multi_aff lowerBounds() const;
+  isl::MultiAff<Scope, Tensor> lowerBounds() const;
 };
 
 // Descriptor of tensor reference in a Scop.
