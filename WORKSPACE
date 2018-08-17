@@ -9,7 +9,7 @@ git_repository(
 )
 
 http_archive(
-    name = "com_google_protobuf",
+    name = "protobuf_archive",
     urls = [
         "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.6.0.tar.gz",
         "https://github.com/google/protobuf/archive/v3.6.0.tar.gz",
@@ -18,15 +18,25 @@ http_archive(
     strip_prefix = "protobuf-3.6.0",
 )
 
-http_archive(
-    name = "com_google_protobuf_cc",
-    urls = [
-        "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.6.0.tar.gz",
-        "https://github.com/google/protobuf/archive/v3.6.0.tar.gz",
-    ],
-    sha256 = "50a5753995b3142627ac55cfd496cebc418a2e575ca0236e29033c67bd5665f4",
-    strip_prefix = "protobuf-3.6.0",
-)
+#http_archive(
+#    name = "com_google_protobuf",
+#    urls = [
+#        "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.6.0.tar.gz",
+#        "https://github.com/google/protobuf/archive/v3.6.0.tar.gz",
+#    ],
+#    sha256 = "50a5753995b3142627ac55cfd496cebc418a2e575ca0236e29033c67bd5665f4",
+#    strip_prefix = "protobuf-3.6.0",
+#)
+#
+#http_archive(
+#    name = "com_google_protobuf_cc",
+#    urls = [
+#        "https://mirror.bazel.build/github.com/google/protobuf/archive/v3.6.0.tar.gz",
+#        "https://github.com/google/protobuf/archive/v3.6.0.tar.gz",
+#    ],
+#    sha256 = "50a5753995b3142627ac55cfd496cebc418a2e575ca0236e29033c67bd5665f4",
+#    strip_prefix = "protobuf-3.6.0",
+#)
 
 http_archive(
     name = "com_github_gflags_gflags",
