@@ -58,7 +58,8 @@ cc_library(
             "@conda_halide//:conda_halide_lib"],
     copts = ["-Itc/version",
              "-Iexternal/git_halide/include",
-             "-Iexternal/com_github_dmlc_dlpack/include"]
+             "-Iexternal/com_github_dmlc_dlpack/include"],
+    visibility = ["//visibility:public"],
 )
 
 # Core tests
@@ -82,7 +83,8 @@ cc_library(
     deps = [":tc_core", "@conda_aten//:aten_headers"],
     copts = ["-Itc/version",
              "-Iexternal/git_halide/include",
-             "-Iexternal/com_github_dmlc_dlpack/include"]
+             "-Iexternal/com_github_dmlc_dlpack/include"],
+    visibility = ["//visibility:public"],
 )
 
 # Core test with LLVM and ATen
