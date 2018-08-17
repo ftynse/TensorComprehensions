@@ -1,5 +1,7 @@
 workspace(name = "tc")
 
+load("//:tools.bzl", "conda_local_repository")
+
 git_repository(
     name = "com_github_google_glog",
     commit = "e6e2e1372aeb3f6ac6ca5f4a3d72bad8dce3c724",
@@ -59,9 +61,9 @@ new_git_repository(
 )
 
 # FIXME query conda path instead
-new_local_repository(
+conda_local_repository(
     name = "conda_aten",
-    path = "/home/zinenko/conda/envs/tctf/lib/python3.6/site-packages/torch/lib",
+    path = "lib/python3.6/site-packages/torch/lib",
     build_file_content = """
 cc_library(
     name = "aten_headers",
@@ -73,9 +75,9 @@ cc_library(
     """
 )
 
-new_local_repository(
+conda_local_repository(
     name = "conda_llvm",
-    path = "/home/zinenko/conda/envs/tctf",
+    path = "",
     build_file_content = """
 cc_library(
     name = "conda_llvm_lib",
@@ -88,9 +90,9 @@ cc_library(
     """
 )
 
-new_local_repository(
+conda_local_repository(
     name = "conda_clang",
-    path = "/home/zinenko/conda/envs/tctf",
+    path = "",
     build_file_content = """
 cc_library(
     name = "conda_clang_lib",
@@ -102,9 +104,9 @@ cc_library(
   """
 )
 
-new_local_repository(
+conda_local_repository(
     name = "conda_halide",
-    path = "/home/zinenko/conda/envs/tctf",
+    path = "",
     build_file_content = """
 cc_library(
     name = "conda_halide_lib",
