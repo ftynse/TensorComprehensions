@@ -51,6 +51,13 @@ new_git_repository(
     build_file = "dlpack.BUILD"
 )
 
+new_git_repository(
+    name = "com_github_nicolasvasilache_isl",
+    commit = "96fef8767ee8823d0316e040c827c78b28802ce9",
+    remote = "https://github.com/nicolasvasilache/isl.git",
+    build_file = "isl.BUILD"
+)
+
 # FIXME query conda path instead
 new_local_repository(
     name = "conda_aten",
