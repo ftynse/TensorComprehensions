@@ -1,5 +1,5 @@
 syntax = "proto2";
-import "mapping_options.proto";
+import "tc/proto/mapping_options.proto";
 
 package tc;
 
