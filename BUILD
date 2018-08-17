@@ -47,6 +47,7 @@ cc_library(
         "tc/external/detail/*.h",
         "tc/core/polyhedral/cpu/*.h",
         "tc/core/cpu/*.h"]),
+    includes = ["."],
     deps = [":tc_lang",
             ":tc_version",
             ":tc_isl",
