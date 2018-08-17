@@ -19,7 +19,7 @@ cc_library(
     srcs = ["tc/version/version.cc"],
     hdrs = ["tc/version/version.h"],
     data = [":config_version_cc"],
-    copts = ["-Itc/version"],
+    includes = ["tc/version"],
 )
 
 # isl and interface
@@ -56,7 +56,6 @@ cc_library(
             "@com_github_dmlc_dlpack//:dlpack",
             "@conda_llvm//:conda_llvm_lib",
             "@conda_halide//:conda_halide_lib"],
-    copts = ["-Itc/version"],
     visibility = ["//visibility:public"],
 )
 
@@ -68,7 +67,6 @@ cc_binary(
         "tc/library/*.h"]),
     deps = [":tc_core",
             "@com_github_google_googletest//:gtest"],
-    copts = ["-Itc/version"],
 )
 
 # Aten library
@@ -77,7 +75,6 @@ cc_library(
     srcs = ["tc/aten/aten_compiler.cc"],
     hdrs = glob(["tc/aten/*.h"]),
     deps = [":tc_core", "@conda_aten//:aten_headers"],
-    copts = ["-Itc/version"],
     visibility = ["//visibility:public"],
 )
 
@@ -89,5 +86,4 @@ cc_binary(
     deps = [":tc_aten",
             "@com_github_google_googletest//:gtest",
             ],
-    copts = ["-Itc/version"],
 )
