@@ -57,7 +57,6 @@ cc_library(
             "@conda_llvm//:conda_llvm_lib",
             "@conda_halide//:conda_halide_lib"],
     copts = ["-Itc/version",
-             "-Iexternal/git_halide/include",
              "-Iexternal/com_github_dmlc_dlpack/include"],
     visibility = ["//visibility:public"],
 )
@@ -71,7 +70,6 @@ cc_binary(
     deps = [":tc_core",
             "@com_github_google_googletest//:gtest"],
     copts = ["-Itc/version",
-             "-Iexternal/git_halide/include",
              "-Iexternal/com_github_dmlc_dlpack/include"]
 )
 
@@ -82,7 +80,6 @@ cc_library(
     hdrs = glob(["tc/aten/*.h"]),
     deps = [":tc_core", "@conda_aten//:aten_headers"],
     copts = ["-Itc/version",
-             "-Iexternal/git_halide/include",
              "-Iexternal/com_github_dmlc_dlpack/include"],
     visibility = ["//visibility:public"],
 )
@@ -96,6 +93,5 @@ cc_binary(
             "@com_github_google_googletest//:gtest",
             ],
     copts = ["-Itc/version",
-             "-Iexternal/halide/include",
              "-Iexternal/com_github_dmlc_dlpack/include"]
 )
